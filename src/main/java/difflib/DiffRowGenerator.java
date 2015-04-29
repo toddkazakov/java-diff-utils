@@ -50,6 +50,7 @@ public class DiffRowGenerator {
     private final String InlineNewCssClass;
     private final int columnWidth;
     private final Equalizer<String> equalizer;
+    private final String defaultChangedString;
 
     /**
      * This class used for building the DiffRowGenerator.
@@ -65,6 +66,7 @@ public class DiffRowGenerator {
         private String InlineOldCssClass = "editOldInline";
         private String InlineNewCssClass = "editNewInline";
         private int columnWidth = 80;
+        private String defaultChangedString = null;
 
         /**
          * Show inline diffs in generating diff rows or not.
@@ -148,6 +150,11 @@ public class DiffRowGenerator {
             return this;
         }
 
+        public Builder defaultChangedString(String value) {
+            defaultChangedString = value;
+            return this;
+        }
+
         /**
          * Build the DiffRowGenerator. If some parameters is not set, the default values are used.
          * @return the customized DiffRowGenerator
@@ -166,6 +173,7 @@ public class DiffRowGenerator {
         InlineOldCssClass = builder.InlineOldCssClass;
         InlineNewCssClass = builder.InlineNewCssClass;
         columnWidth = builder.columnWidth; //
+        defaultChangedString = builder.defaultChangedString;
         equalizer = new Equalizer<String>() {
             public boolean equals(String original, String revised) {
                 if (ignoreWhiteSpaces) {
@@ -268,12 +276,12 @@ public class DiffRowGenerator {
             } else if (orig.size() > rev.size()) {
                 for (int j = 0; j < orig.size(); j++) {
                     diffRows.add(new DiffRow(Tag.CHANGE, (String) orig.getLines().get(j), rev
-                            .getLines().size() > j ? (String) rev.getLines().get(j) : ""));
+                            .getLines().size() > j ? (String) rev.getLines().get(j) : defaultChangedString));
                 }
             } else {
                 for (int j = 0; j < rev.size(); j++) {
                     diffRows.add(new DiffRow(Tag.CHANGE, orig.getLines().size() > j ? (String) orig
-                            .getLines().get(j) : "", (String) rev.getLines().get(j)));
+                            .getLines().get(j) : defaultChangedString, (String) rev.getLines().get(j)));
                 }
             }
             endPos = orig.last() + 1;
